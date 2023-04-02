@@ -3,7 +3,7 @@
     <head><title>nigger</title></html>
     <body>
         <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
-        <button id="kmeansButton">kmeans</button>
+        <button onclick="kmeansclusters(points, ctx)">kmeans</button>
         <script>
             // Получаем элемент canvas
             const canvas = document.getElementById('myCanvas');
@@ -12,7 +12,7 @@
             const ctx = canvas.getContext('2d');
           
             // Создаем массив для хранения точек
-            var points = [];
+            let points = [];
           
             // Обработчик события клика на canvas
             canvas.addEventListener('click', function(event) {
@@ -122,8 +122,8 @@
                     ctx.closePath();
                 }
             }
-            const clusterBtn = document.getElementById('kmeansButton');
-            clusterBtn.addEventListener('click', kmeansclusters(points, ctx));
+            //const clusterBtn = document.getElementById('kmeansButton');
+            //clusterBtn.addEventListener('click', kmeansclusters(points, ctx));
         </script>
     </body>
 </html>
