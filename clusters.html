@@ -4,6 +4,7 @@
     <body>
         <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
         <button onclick="kmeansclusters(points, ctx)">kmeans</button>
+        <button onclick="hierarchyclusters(points, ctx)">hiers</button>
         <script>
             // Получаем элемент canvas
             const canvas = document.getElementById('myCanvas');
@@ -97,6 +98,60 @@
             }
             function kmeansclusters(points, ctx){
                 let clusters = kMeansClustering(points, 3);
+                console.log(clusters[0].length);
+                console.log(clusters[1].length);
+                console.log(clusters[2].length);
+                for(let i = 0; i < clusters[0].length; i++){
+                    ctx.beginPath();
+                    ctx.arc(clusters[0][i].x, clusters[0][i].y, 15, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'blue';
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                for(let i = 0; i < clusters[1].length; i++){
+                    ctx.beginPath();
+                    ctx.arc(clusters[1][i].x, clusters[1][i].y, 15, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                for(let i = 0; i < clusters[2].length; i++){
+                    ctx.beginPath();
+                    ctx.arc(clusters[2][i].x, clusters[2][i].y, 15, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'green';
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+            function hierarchicalClustering(points, numClusters) {
+                // Создание начальных кластеров из отдельных точек
+                let clusters = points.map(point => [point]);
+
+                while (clusters.length > numClusters) {
+                    // Вычисление расстояний между всеми кластерами
+                    let distances = [];
+                    for (let i = 0; i < clusters.length; i++) {
+                    for (let j = i + 1; j < clusters.length; j++) {
+                        let distance1 = Math.min(...clusters[i].map(point1 => Math.min(...clusters[j].map(point2 => distance(point1, point2)))));
+                        distances.push({ i, j, distance1 });
+                    }
+                    }
+
+                    // Нахождение пары кластеров с наименьшим расстоянием
+                    let minDistance = Math.min(...distances.map(d => d.distance1));
+                    let closestClusters = distances.filter(d => d.distance1 === minDistance)[0];
+
+                    // Объединение пары кластеров в один
+                    let newCluster = [...clusters[closestClusters.i], ...clusters[closestClusters.j]];
+                    clusters.splice(closestClusters.j, 1);
+                    clusters.splice(closestClusters.i, 1);
+                    clusters.push(newCluster);
+                }
+
+                return clusters;
+            }
+            function hierarchyclusters(points, ctx){
+                let clusters = hierarchicalClustering(points, 3);
                 console.log(clusters[0].length);
                 console.log(clusters[1].length);
                 console.log(clusters[2].length);
