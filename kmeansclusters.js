@@ -18,33 +18,67 @@ function generateRandomPoints(numPoints) {
             return Math.sqrt(dx * dx + dy * dy);
             }
 
-            // Кластеризация по алгоритму к-средних
-            function hierarchicalClustering(points, numClusters) {
-                // Создание начальных кластеров из отдельных точек
-                let clusters = points.map(point => [point]);
-
-                while (clusters.length > numClusters) {
-                    // Вычисление расстояний между всеми кластерами
-                    let distances = [];
-                    for (let i = 0; i < clusters.length; i++) {
-                    for (let j = i + 1; j < clusters.length; j++) {
-                        let distance1 = Math.min(...clusters[i].map(point1 => Math.min(...clusters[j].map(point2 => distance(point1, point2)))));
-                        distances.push({ i, j, distance1 });
-                    }
-                    }
-
-                    // Нахождение пары кластеров с наименьшим расстоянием
-                    let minDistance = Math.min(...distances.map(d => d.distance1));
-                    let closestClusters = distances.filter(d => d.distance1 === minDistance)[0];
-
-                    // Объединение пары кластеров в один
-                    let newCluster = [...clusters[closestClusters.i], ...clusters[closestClusters.j]];
-                    clusters.splice(closestClusters.j, 1);
-                    clusters.splice(closestClusters.i, 1);
-                    clusters.push(newCluster);
+            function initMedoids(points, numClusters) {
+                const medoids = [];
+                for (let i = 0; i < numClusters; i++) {
+                  let randomIndex = Math.floor(Math.random() * points.length);
+                  while (medoids.includes(points[randomIndex])) {
+                    randomIndex = Math.floor(Math.random() * points.length);
+                  }
+                  medoids.push(points[randomIndex]);
                 }
-
+                return medoids;
+              }
+            function pamClustering(points, numClusters) {
+                let medoids = initMedoids(points, numClusters);
+                let clusters = [];
+                let iterations = 0;
+              
+                while (true) {
+                  // Создание пустых кластеров
+                  for (let i = 0; i < numClusters; i++) {
+                    clusters[i] = [];
+                  }
+              
+                  // Распределение точек по медоидам
+                  for (let i = 0; i < points.length; i++) {
+                    let minDistance = Infinity;
+                    let closestMedoid = null;
+                    for (let j = 0; j < medoids.length; j++) {
+                      const d = distance(points[i], medoids[j]);
+                      if (d < minDistance) {
+                        minDistance = d;
+                        closestMedoid = j;
+                      }
+                    }
+                    clusters[closestMedoid].push(points[i]);
+                  }
+              
+                  // Пересчет медоидов
+                  let newMedoids = [];
+                  for (let i = 0; i < numClusters; i++) {
+                    const cluster = clusters[i];
+                    let minDistanceSum = Infinity;
+                    let newMedoid = null;
+                    for (let j = 0; j < cluster.length; j++) {
+                      const candidateMedoid = cluster[j];
+                      const distanceSum = cluster.reduce((acc, point) => acc + distance(point, candidateMedoid), 0);
+                      if (distanceSum < minDistanceSum) {
+                        minDistanceSum = distanceSum;
+                        newMedoid = candidateMedoid;
+                      }
+                    }
+                    newMedoids.push(newMedoid);
+                  }
+              
+                  // Проверка на завершение алгоритма
+                  iterations++;
+                  if (iterations > 100 || JSON.stringify(newMedoids) === JSON.stringify(medoids)) {
+                    break;
+                  }
+                  medoids = newMedoids;
+                }
                 return clusters;
-            }
-let clusters = hierarchicalClustering(points, 3);
+              }
+let clusters = pamClustering(points, 3);
 console.log(clusters);
