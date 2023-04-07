@@ -1,7 +1,22 @@
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
+function getDist(cities){
+    let distCities = [];
 
+    let dist = 0;
+    for (let i = 0; i < cities.length; i++){
+        distCities.push([])
+        for (let j = 0; j < cities.length; j++){
+            dist = Math.round(Math.sqrt(
+                Math.pow(cities[i][0] - cities[j][0], 2) + Math.pow(cities[i][1] - cities[j][1], 2)
+            ));
+            distCities[i].push(dist);
+        }
+    }
+    return distCities;
+}
 class City{
     constructor(num, closeCities = []) {
         this.num = num;
@@ -101,63 +116,69 @@ function crossover(parent1, parent2, mutChance, distCities){
     if (child1.distance < child2.distance) return child1;
     else return child2;
 }
-function genAlg(file){
-    let reader = new FileReader();
-    reader.readAsText(file.files[0])
-    reader.onload = function (){
-        //
-        let popSize = 100;
-        let wrGroupSize = 5;
-        let mutChance = 3;
-        let maxGen = 1000000;
-        let numCloseCities = 5;
-        let chanceUseCloseCity = 90;
-        //
-        let distCities = [];
-        let readRes = (reader.result).split("\r\n");
-        let numCities = readRes[0].split(" ").length;
 
-        for (let i = 0; i < readRes.length; i++) {
-            distCities[i] = (readRes[i].split(" ")).map(Number);
-        }
-
-        let cities = [];
-        for (let i = 0; i < numCities; i++){
-            let city = new City(i);
-            city.findCloseCities(numCities, numCloseCities, distCities);
-            cities.push(city);
-        }
-
-        let population = [];
-        for (let i = 0; i < popSize; i++){
-            let tour = new Tour;
-            tour.generateTour(numCities, numCloseCities, distCities, cities, chanceUseCloseCity);
-            population.push(tour);
-        }
-        population.sort((a, b) => {return a.distance - b.distance});
-        let best = population[0];
-        //console.log(best);
-
-        let wrGroup = [];
-        for (let i = 0; i < maxGen; i++){
-            while(wrGroup.length < wrGroupSize) {
-                let a = getRandomInt(popSize);
-                wrGroup.push(population[a]);
-            }
-            wrGroup.sort((a, b) => {return a.distance - b.distance});
-            //console.log(wrGroup);
-            wrGroup[wrGroupSize-1] = crossover(wrGroup[0], wrGroup[1], mutChance, distCities);
-            //console.log(wrGroup);
-            for (let j = 0; j < wrGroupSize; j++) population[popSize-1-j] = wrGroup[j];
-            wrGroup = [];
-            population.sort((a, b) => {return a.distance - b.distance});
-
-            if(population[0].distance < best.distance) best = population[0];
-        }
-        console.log("best way: ");
-        console.log(best);
-
+function drawTour(citiesCoords, tour){
+    clearCanvas();
+    restore(citiesCoords);
+    ctx.beginPath();
+    ctx.moveTo(citiesCoords[tour.tour[0]][0], citiesCoords[tour.tour[0]][1]);
+    for(let i = 1; i < tour.tour.length; i++){
+        ctx.lineTo(citiesCoords[tour.tour[i]][0], citiesCoords[tour.tour[i]][1])
     }
+    ctx.stroke();
+}
+function genAlg(citiesCord){
+    let numCities = citiesCord.length;
+    let distCities = getDist(citiesCord);
+
+    //
+    let popSize = 100;
+    let wrGroupSize = 5;
+    let mutChance = 3;
+    let maxGen = document.getElementById("maxGen").value;
+    let numCloseCities = (numCities > 5) ? 5 : numCities - 1;
+    let chanceUseCloseCity = 90;
+    //
+
+    let cities = [];
+    for (let i = 0; i < numCities; i++){
+        let city = new City(i);
+        city.findCloseCities(numCities, numCloseCities, distCities);
+        cities.push(city);
+    }
+
+    let population = [];
+    for (let i = 0; i < popSize; i++){
+        let tour = new Tour;
+        tour.generateTour(numCities, numCloseCities, distCities, cities, chanceUseCloseCity);
+        population.push(tour);
+    }
+    population.sort((a, b) => {return a.distance - b.distance});
+    let best = population[0];
+    drawTour(citiesCord, best);
+    //console.log(best);
+
+    let wrGroup = [];
+    for (let i = 0; i < maxGen; i++){
+        while(wrGroup.length < wrGroupSize) {
+            let a = getRandomInt(popSize);
+            wrGroup.push(population[a]);
+        }
+        wrGroup.sort((a, b) => {return a.distance - b.distance});
+        //console.log(wrGroup);
+        wrGroup[wrGroupSize-1] = crossover(wrGroup[0], wrGroup[1], mutChance, distCities);
+        //console.log(wrGroup);
+        for (let j = 0; j < wrGroupSize; j++) population[popSize-1-j] = wrGroup[j];
+        wrGroup = [];
+        population.sort((a, b) => {return a.distance - b.distance});
+
+        if(population[0].distance < best.distance) {
+            best = population[0];
+            drawTour(citiesCord, best);
+        }
+    }
+    console.log("best way: ");
+    console.log(best);
 
 }
 

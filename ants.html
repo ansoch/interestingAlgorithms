@@ -1,12 +1,62 @@
 <!DOCTYPE html>
 <html lang = "en">
-<head>
-    <meta charset = "utf-8">
-    <title>ANTS</title>
-</head>
-<body>
-<p>МУРАВЬИ</p>
-<input type="file" onchange="antAlg(this)"></input>
-<script src = ant_alg.js></script>
-</body>
+    <head>
+        <meta charset = "utf-8">
+        <title>Ants</title>
+        <link rel="stylesheet" href = "genCSS.css">
+    </head>
+
+    <body>
+    <div class="sidenav">
+        <a href="genetic.html">ГЕНЕТИКА</a>
+        <a href="ants.html">МУРАВЬИ</a>
+    </div>
+
+    <div class="main">
+        <p align="center">МУРАВЬИ</p>
+        <canvas id = "canvas" style="display: block; border: 2px solid black"></canvas>
+        <script>
+            let canvas = document.getElementById("canvas");
+            let ctx = canvas.getContext("2d");
+            canvas.width = 1200;
+            canvas.height = 800;
+            ctx.lineWidth = 7;
+            //
+            let citiesCord = [];
+
+            canvas.addEventListener("mousedown", function addCity(pos){
+                let x = pos.clientX - 160;
+                let y = pos.clientY - 60;
+                for (let i = 0; i < citiesCord.length; i++){
+                    if (Math.sqrt(
+                        Math.pow(citiesCord[i][0] - x, 2) + Math.pow(citiesCord[i][1] - y, 2)
+                    ) <= 60){
+                        return;
+                    }
+                }
+                ctx.beginPath();
+                ctx.arc(x ,y , 15, 0, 2 * Math.PI);
+                ctx.fill();
+                citiesCord.push([x, y]);
+            });
+
+            function clearCanvas(){
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            function restore(cities){
+                for (let i = 0; i < cities.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(citiesCord[i][0], citiesCord[i][1], 15, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+        </script>
+    </div>
+
+    <div class="settings">
+        <button id="Gen" onclick="antAlg(citiesCord)"> Запустить </button>
+    </div>
+
+    <script src = ant_alg.js></script>
+    </body>
 </html>
