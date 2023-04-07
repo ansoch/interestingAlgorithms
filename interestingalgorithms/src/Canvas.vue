@@ -1,5 +1,6 @@
 <template>
     <canvas ref="canvas" @click="draw" width="640" height="640" style="border:3px solid #404345; border-radius: 10px;"></canvas>
+    <button @click="clearPoints()">очистить точки</button>
 </template>
 
 <script>
@@ -40,6 +41,11 @@ export default {
             const dy = point1.y - point2.y;
             return Math.sqrt(dx * dx + dy * dy);
         },
+        clearPoints(){
+            const canvas = this.$refs.canvas;
+            this.points = [];
+            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+        }
     }
 };
 </script>
