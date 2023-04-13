@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+    <title></title>
+  </head>
+  <body>
+    <ul>
+      <li>Чебурашка
+        <ul>
+          <li>Чебурашка
+            <ul>
+              <li>Чебурашка</li>
+              <li>Крокодил Гена</li>
+              <li>Шапокляк</li>
+            </ul>
+          </li>
+          <li>Крокодил Гена</li>
+          <li>Шапокляк</li>
+        </ul>
+      </li>
+      <li>Крокодил Гена</li>
+      <li>Шапокляк</li>
+    </ul>
+    <div id="decision-tree"> </div>
+    <script>data = [
+        [2,'Tom',12],
+        [2,'Tom',14],
+        [2,'Alex',8],
+        [21,'Alex',9],
+        [2,'Alex',10],
+        [2,'Tom',11]
+    ]
+    function calculateEntropy(data) {
+        /*
+        Функция вычисляет энтропию для заданного набора данных
+      
+        :param data: набор данных
+        :return: энтропия
+        */
+        
+        // вычисляем количество элементов в каждом классе
+        const class_counts = {};
+        for (let row of data) {
+          const label = row[row.length - 1];
+          if (label in class_counts) {
+            class_counts[label]++;
+          } else {
+            class_counts[label] = 1;
+          }
+        }
+      
+        // вычисляем энтропию
+        let entropy = 0;
+        const total_count = data.length;
+        for (let label in class_counts) {
+          const count = class_counts[label];
+          const probability = count / total_count;
+          entropy -= probability * Math.log2(probability);
+        }
+      
+        return entropy;
+    }
+    function calculateInformationGain(data, feature) {
+        /*
+        Функция вычисляет информационный выигрыш для заданного признака
+      
+        :param data: набор данных
+        :param feature: признак
+        :return: информационный выигрыш
+        */
+        
+        // вычисляем энтропию до разбиения
+        const total_entropy = calculateEntropy(data);
+        
+        // разбиваем данные на две группы по значению признака
+        const group_1 = data.filter(row => row[feature] === 0);
+        const group_2 = data.filter(row => row[feature] === 1);
+      
+        // вычисляем энтропию после разбиения
+        const entropy_1 = calculateEntropy(group_1);
+        const entropy_2 = calculateEntropy(group_2);
+      
+        // вычисляем взвешенную сумму энтропий
+        const weight_1 = group_1.length / data.length;
+        const weight_2 = group_2.length / data.length;
+        const weighted_entropy = weight_1 * entropy_1 + weight_2 * entropy_2;
+      
+        // вычисляем информационный выигрыш
+        const information_gain = total_entropy - weighted_entropy;
+      
+        return information_gain;
+    }
+    function buildDecisionTree(data, features) {
+        // Проверяем, что все элементы в данных имеют одинаковый класс
+        if (data.every((item) => item[item.length - 1] === data[0][data[0].length - 1])) {
+          return { value: data[0][data[0].length - 1] };
+        }
+        
+        // Проверяем, что больше не осталось признаков
+        if (features.length === 0) {
+          const classCounts = {};
+          data.forEach((item) => {
+            if (!classCounts[item[item.length - 1]]) {
+              classCounts[item[item.length - 1]] = 0;
+            }
+            classCounts[item[item.length - 1]]++;
+          });
+          const maxClass = Object.keys(classCounts).reduce((a, b) => classCounts[a] > classCounts[b] ? a : b);
+          return { value: maxClass };
+        }
+        
+        // Находим признак с максимальной информативностью
+        let bestFeatureIndex = 0;
+        let bestFeatureInfoGain = -1;
+        for (let i = 0; i < features.length; i++) {
+          const featureIndex = features[i];
+          const infoGain = calculateInformationGain(data, featureIndex);
+          if (infoGain > bestFeatureInfoGain) {
+            bestFeatureIndex = featureIndex;
+            bestFeatureInfoGain = infoGain;
+          }
+        }
+        
+        // Создаем узел дерева с выбранным признаком
+        const tree = { featureIndex: bestFeatureIndex, children: [] };
+        
+        // Рекурсивно строим поддеревья для каждого значения выбранного признака
+        const featureValues = new Set(data.map((item) => item[bestFeatureIndex]));
+        const newFeatures = features.filter((item) => item !== bestFeatureIndex);
+        featureValues.forEach((value) => {
+          const newData = data.filter((item) => item[bestFeatureIndex] === value);
+          const subtree = buildDecisionTree(newData, newFeatures);
+          tree.children.push({ value: value, subtree: subtree });
+        });
+        
+        return tree;
+    }
+    let tree = buildDecisionTree(data, [0,1,2]);
+    console.log(tree);
+    function generateHtmlForNode(node) {
+      let html = '';
+      if (node.value) {
+        html += `<div>${node.value}</div>`;
+      } else {
+        html += `<div>Feature: ${node.featureIndex}</div>`;
+        node.children.forEach((child) => {
+          html += `<div>Value: ${child.value}</div>`;
+          html += generateHtmlForNode(child.subtree);
+        });
+      }
+      return html;
+    }
+    document.getElementById('decision-tree').innerHTML = generateHtmlForNode(tree);</script>
+  </body>
+</html>
