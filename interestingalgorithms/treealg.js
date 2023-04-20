@@ -1,20 +1,12 @@
 data = [
-    [2,'Tom',12],
-    [2,'Alex',14],
-    [2,'Alex',8],
-    [21,'Alex',9],
-    [2,'Tom',10],
-    [2,'Tom',11]
+  [2,'Tom',12],
+  [3,'Tom',14],
+  [4,'Alex',8],
+  [21,'Alex',9],
+  [13,'Alex',10],
+  [8,'Tom',11]
 ]
 function calculateEntropy(data) {
-    /*
-    Функция вычисляет энтропию для заданного набора данных
-  
-    :param data: набор данных
-    :return: энтропия
-    */
-    
-    // вычисляем количество элементов в каждом классе
     const class_counts = {};
     for (let row of data) {
       const label = row[row.length - 1];
@@ -37,15 +29,6 @@ function calculateEntropy(data) {
     return entropy;
 }
 function calculateInformationGain(data, feature) {
-    /*
-    Функция вычисляет информационный выигрыш для заданного признака
-  
-    :param data: набор данных
-    :param feature: признак
-    :return: информационный выигрыш
-    */
-    
-    // вычисляем энтропию до разбиения
     const total_entropy = calculateEntropy(data);
     
     // разбиваем данные на две группы по значению признака
@@ -157,3 +140,33 @@ console.log(tree.children[4].subtree);
 console.log(tree.children[5].subtree);
 */
 
+if (typeof data0bestFeatureIndex === 'number') {
+  // Сортируем данные по значению признака
+  data.sort((a, b) => abestFeatureIndex - bbestFeatureIndex);
+  // Вычисляем пороговые значения
+  const thresholds = ;
+  for (let i = 0; i < data.length - 1; i++) {
+    if (dataibestFeatureIndex !== datai + 1bestFeatureIndex) {
+      thresholds.push((dataibestFeatureIndex + datai + 1bestFeatureIndex) / 2);
+    }
+  }
+  // Рекурсивно строим поддеревья для каждого порогового значения
+  thresholds.forEach((threshold) => {
+    const newData = data.filter((item) => itembestFeatureIndex <= threshold);
+    const subtree1 = this.buildDecisionTree(newData, newFeatures);
+    const subtree2 = this.buildDecisionTree(data.filter((item) => itembestFeatureIndex > threshold), newFeatures);
+    tree.children.push({ value: <= ${threshold}, subtree: subtree1, isRed: false });
+    tree.children.push({ value: > ${threshold}, subtree: subtree2, isRed: false });
+  });
+} else {
+  // Создаем узел дерева с выбранным признаком
+  const tree = { featureIndex: bestFeatureIndex, children:  };
+  // Рекурсивно строим поддеревья для каждого значения выбранного признака
+  const featureValues = new Set(data.map((item) => itembestFeatureIndex));
+  const newFeatures = features.filter((item) => item !== bestFeatureIndex);
+  featureValues.forEach((value) => {
+    const newData = data.filter((item) => itembestFeatureIndex === value);
+    const subtree = this.buildDecisionTree(newData, newFeatures);
+    tree.children.push({ value: value, subtree: subtree, isRed: false });
+  });
+} 
