@@ -1,0 +1,350 @@
+let data = [
+    [5.1,3.5,1.4,0.2,'setosa'],
+    [4.9,3.0,1.4,0.2,'setosa'],
+    [4.7,3.2,1.3,0.2,'setosa'],
+    [4.6,3.1,1.5,0.2,'setosa'],
+    [5.0,3.6,1.4,0.2,'setosa'],
+    [5.4,3.9,1.7,0.4,'setosa'],
+    [4.6,3.4,1.4,0.3,'setosa'],
+    [5.0,3.4,1.5,0.2,'setosa'],
+    [4.4,2.9,1.4,0.2,'setosa'],
+    [4.9,3.1,1.5,0.1,'setosa'],
+    [5.4,3.7,1.5,0.2,'setosa'],
+    [7.0,3.2,4.7,1.4,'versicolor'],
+    [6.4,3.2,4.5,1.5,'versicolor'],
+    [6.9, 	3.1, 	4.9, 	1.5,'versicolor'],
+    [5.5, 	2.3,	4.0, 	1.3,'versicolor'],
+    [6.5, 	2.8, 	4.6, 	1.5,'versicolor'],
+    [5.7, 	2.8, 	4.5, 	1.3,'versicolor'],
+    [6.3, 	3.3, 	4.7, 	1.6,'versicolor'],
+    [4.9, 	2.4, 	3.3, 	1.0,'versicolor'],
+    [6.6, 	2.9, 	4.6, 	1.3,'versicolor'],
+    [5.2, 	2.7, 	3.9, 	1.4,'versicolor']
+];
+let data1 = [
+    [5.1,3.5,1.4,0.2],
+    [4.9,3.0,1.4,0.2],
+    [4.7,3.2,1.3,0.2],
+    [4.6,3.1,1.5,0.2],
+    [5.0,3.6,1.4,0.2],
+    [5.4,3.9,1.7,0.4],
+    [4.6,3.4,1.4,0.3],
+    [5.0,3.4,1.5,0.2],
+    [4.4,2.9,1.4,0.2],
+    [4.9,3.1,1.5,0.1],
+    [5.4,3.7,1.5,0.2],
+    [4.8,3.4,1.6,0.2],
+    [4.8,3.0,1.4,0.1],
+    [4.3,3.0,1.1,0.1],
+    [5.8,4.0,1.2,0.2],
+    [5.7,4.4,1.5,0.4],
+    [5.4,3.9,1.3,0.4],
+    [5.1,3.5,1.4,0.3],
+    [5.7,3.8,1.7,0.3],
+    [5.1,3.8,1.5,0.3],
+    [5.4,3.4,1.7,0.2]
+];
+function split_data(data, column, value) {
+    let left = [];
+    let right = [];
+    for (let row of data) {
+        if (row[column] <= value) {
+            left.push(row);
+        } else {
+            right.push(row);
+        }
+    }
+    return [left, right];
+}
+function entropy(data) {
+    let total = data.flat().length;
+    let counts = {};
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        let value = data[i][j];
+        if (counts[value]) {
+          counts[value]++;
+        } else {
+          counts[value] = 1;
+        }
+      }
+    }
+    let result = 0;
+    for (let key in counts) {
+      let probability = counts[key] / total;
+      result -= probability * Math.log2(probability);
+    }
+    return result;
+}
+function entropyNew(data) {
+    let total = data.length;
+    let counts = {};
+    for (let i = 0; i < total; i++) {
+      let label = data[i][data[i].length - 1];
+      if (label in counts) {
+        counts[label]++;
+      } else {
+        counts[label] = 1;
+      }
+    }
+    let entropy = 0;
+    for (let label in counts) {
+      let probability = counts[label] / total;
+      entropy -= probability * Math.log2(probability);
+    }
+    return entropy;
+}
+function calculateEntropy(data) {
+    const class_counts = {};
+    for (let row of data) {
+    const label = row[row.length - 1];
+    if (label in class_counts) {
+        class_counts[label]++;
+    } else {
+        class_counts[label] = 1;
+    }
+    }
+
+    // вычисляем энтропию
+    let entropy = 0;
+    const total_count = data.length;
+    for (let label in class_counts) {
+    const count = class_counts[label];
+    const probability = count / total_count;
+    entropy -= probability * Math.log2(probability);
+    }
+
+    return entropy;
+}
+function entropyAgain(data) {
+    let classes = {}; // объект для подсчета количества объектов каждого класса
+    let total = data.length; // общее количество объектов в выборке
+    let entropy = 0;
+    
+    // подсчет количества объектов каждого класса
+    for (let i = 0; i < total; i++) {
+      let currentClass = data[i][data[i].length - 1]; // последний элемент в каждой строке - класс
+      if (classes[currentClass]) {
+        classes[currentClass]++;
+      } else {
+        classes[currentClass] = 1;
+      }
+    }
+    
+    // вычисление энтропии
+    for (let key in classes) {
+      let probability = classes[key] / total;
+      entropy -= probability * Math.log2(probability);
+    }
+    
+    return entropy;
+  }
+  
+  // Функция для вычисления информационной выгоды
+function informationGain(data, attributeIndex) {
+    const attributeValues = new Set();
+    for (let i = 0; i < data.length; i++) {
+      attributeValues.add(data[i][attributeIndex]);
+    }
+    let gain = entropy(data);
+    for (const value of attributeValues) {
+      const subset = data.filter(row => row[attributeIndex] === value);
+      gain -= subset.length / data.length * entropy(subset);
+    }
+    return gain;
+}
+function informationGainNew(data, attributeIndex) {
+    let total = data.length;
+    let counts = {};
+    for (let i = 0; i < total; i++) {
+      let value = data[i][attributeIndex];
+      if (value in counts) {    
+        counts[value].count++;
+        counts[value].data.push(data[i]);
+      } else {
+        counts[value] = { count: 1, data: [data[i]] };
+      }
+    }
+    let gain = entropy(data);
+    for (let value in counts) {
+      let probability = counts[value].count / total;
+      let subsetEntropy = entropy(counts[value].data);
+      gain -= probability * subsetEntropy;
+    }
+    return gain;
+}
+var entropyxd = function(vals){
+    var uniqueVals = _.unique(vals);
+    var probs = uniqueVals.map(function(x){return prob(x,vals)});
+    var logVals = probs.map(function(p){return -p*log2(p) });
+    return logVals.reduce(function(a,b){return a+b},0);
+}
+function information_gain(data, column) {
+    // Calculate the entropy of the whole dataset
+    let class_counts = {};
+    for (let row of data) {
+        let label = row[row.length - 1];
+        if (!(label in class_counts)) {
+            class_counts[label] = 0;
+        }
+        class_counts[label] += 1;
+    }
+    let entropy = 0;
+    for (let count of Object.values(class_counts)) {
+        let p = count / data.length;
+        entropy -= p * Math.log2(p);
+    }
+    
+    // Calculate the entropy of the two subsets
+    let values = new Set(data.map(row => row[column]));
+    let best_gain = 0;
+    let best_value = null;
+    for (let value of values) {
+        let [left, right] = split_data(data, column, value);
+        if (left.length === 0 || right.length === 0) {
+            continue;
+        }
+        let p = left.length / data.length;
+        let gain = entropy - p * calculateEntropy(left) - (1 - p) * calculateEntropy(right);
+        if (gain > best_gain) {
+            best_gain = gain;
+            best_value = value;
+        }
+    }
+    
+    return [best_gain, best_value];
+}
+class DecisionTree {
+    constructor(data, target) {
+      this.data = data;
+      this.target = target;
+    }
+  
+    entropy(data) {
+      let counts = {};
+      for (let i = 0; i < data.length; i++) {
+        let label = data[i][this.target];
+        counts[label] = counts[label] + 1 || 1;
+      }
+      let entropy = 0;
+      for (let label in counts) {
+        let probability = counts[label] / data.length;
+        entropy += -probability * Math.log2(probability);
+      }
+      return entropy;
+    }
+  
+    gain(data, featureIndex) {
+      let counts = {};
+      let subsetEntropy = 0;
+      for (let i = 0; i < data.length; i++) {
+        let label = data[i][this.target];
+        counts[label] = counts[label] + 1 || 1;
+      }
+      for (let label in counts) {
+        let probability = counts[label] / data.length;
+        let subset = data.filter((row) => row[featureIndex] === label);
+        subsetEntropy += probability * this.entropy(subset);
+      }
+      return this.entropy(data) - subsetEntropy;
+    }
+  
+    bestFeature(data, features) {
+      let bestGain = -Infinity;
+      let bestFeatureIndex = -1;
+      for (let i = 0; i < features.length; i++) {
+        let gain = this.gain(data, i);
+        if (gain > bestGain) {
+          bestGain = gain;
+          bestFeatureIndex = i;
+        }
+      }
+      return bestFeatureIndex;
+    }
+  
+    buildTree(data, features, target) {
+      let labels = data.map((row) => row[target]);
+      if (labels.every((label) => label === labels[0])) {
+        return { value: labels[0] };
+      }
+      if (features.length === 0) {
+        let mostCommonLabel = this.mostCommonLabel(data, target);
+        return { value: mostCommonLabel };
+      }
+      let bestFeatureIndex = this.bestFeature(data, features);
+      let bestFeature = features[bestFeatureIndex];
+      let tree = { attribute: bestFeature, branches: {} };
+      let uniqueValues = new Set(data.map((row) => row[bestFeatureIndex]));
+      for (let value of uniqueValues) {
+        let subset = data.filter((row) => row[bestFeatureIndex] === value);
+        let childTree = this.buildTree(subset, features.filter((f) => f !== bestFeature), target);
+        tree.branches[value] = childTree;
+      }
+      return tree;
+    }
+  
+    mostCommonLabel(data, target) {
+      let counts = {};
+      for (let i = 0; i < data.length; i++) {
+        let label = data[i][target];
+        counts[label] = counts[label] + 1 || 1;
+      }
+      let maxCount = -Infinity;
+      let mostCommonLabel = "";
+      for (let label in counts) {
+        if (counts[label] > maxCount) {
+          maxCount = counts[label];
+          mostCommonLabel = label;
+        }
+      }
+      return mostCommonLabel;
+    }
+  
+    predict(tree, data) {
+      if (tree.value !== undefined) {
+        return tree.value;
+      }
+      let attribute = tree.attribute;
+      let value = data[attribute];
+      if (tree.branches[value] === undefined) {
+        return this.mostCommonLabel(this.data, this.target);
+      }
+      return this.predict(tree.branches[value], data);
+    }
+  
+    fit() {
+      let features = Array.from(new Array(this.data[0].length), (x, i) => i).filter((f) => f !== this.target);
+      this.tree = this.buildTree(this.data, features, this.target);
+    }
+  
+    predictAll(data) {
+      return data.map((row) => this.predict(this.tree, row));
+    }
+}
+let treeBuilder = new DecisionTree(data);
+let tree = treeBuilder.buildTree(data, [0,1,2,3,4], 0);
+console.log(tree);
+console.log(tree.branches);
+
+console.log(entropy(data));
+console.log(entropyNew(data));
+console.log(calculateEntropy(data));
+console.log(entropyAgain(data));
+console.log("asdasdasda");
+console.log(informationGain(data, 0));
+console.log(informationGain(data, 1));
+console.log(informationGain(data, 2));
+console.log(informationGain(data, 3));
+console.log(informationGain(data, 4));
+console.log("asdasdasda");
+console.log(informationGainNew(data, 0));
+console.log(informationGainNew(data, 1));
+console.log(informationGainNew(data, 2));
+console.log(informationGainNew(data, 3));
+console.log(informationGainNew(data, 4));
+console.log("asdasdasda");
+console.log(information_gain(data, 0));
+console.log(information_gain(data, 1));
+console.log(information_gain(data, 2));
+console.log(information_gain(data, 3));
+console.log(information_gain(data, 4));

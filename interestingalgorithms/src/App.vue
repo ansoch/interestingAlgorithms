@@ -1,11 +1,17 @@
 <template>
     <div>
-        <canvas ref="canvas" @click="draw" width="640" height="640" style="border:3px solid #404345; border-radius: 10px;"></canvas>
+        <div class="app">
+        <div class="canvasPanel"><div class="panel"><canvas ref="canvas" @click="draw" width="640" height="640" style="border:3px solid #404345; border-radius: 10px;"></canvas></div></div>
         <div class="buttonPanel">
+        <div class="panel">
+        <div class="buttons">
         <input type="range" min="2" max="10" v-model="numClusters">
         <button @click="kMeansClustering()">kmeans</button>
         <button @click="hierarchicalClustering()">hierarchical</button>
         <button @click="clearPoints()">очистить точки</button>
+        </div>
+        </div>
+        </div>
         </div>
     </div>
 </template>
@@ -178,9 +184,53 @@ export default{
 </script>
 
 <style>
+.buttons{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.app{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+}
+.canvasPanel{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .buttonPanel{
+    margin-left: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+.panel{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: fit-content;
-    background-color: "#bdd1dc";
+    width: fit-content;
+    background-color: #b2bccf;
     border-radius: 10px;
+    padding: 15px;
+}
+button{
+    background: none;
+    align-self: flex-end;
+    border: 1px solid black;
+    padding: 5px 5px;
+    margin-left: 5px;
+    border-radius: 4px;
+}
+button:hover {
+  background-color: #cbdbfc; /* цвет кнопки при наведении */
+}
+canvas{
+    background-color: white;
 }
 </style>

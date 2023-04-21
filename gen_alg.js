@@ -148,16 +148,27 @@ function genAlg(citiesCord){
     }
 
     let population = [];
+    let bestDistance = 99999999;
     for (let i = 0; i < popSize; i++){
         let tour = new Tour;
         tour.generateTour(numCities, numCloseCities, distCities, cities, chanceUseCloseCity);
         population.push(tour);
+        if(tour.distance - bestDistance < 0){
+            drawTour(citiesCord, tour);
+            bestDistance = population[i].distance;
+            console.log("benis");
+            console.log(population[i].distance);
+            setTimeout(function() {
+                // Код, который будет выполнен после 3 секунд
+              }, 1000);
+        }
     }
     population.sort((a, b) => {return a.distance - b.distance});
     let best = population[0];
     drawTour(citiesCord, best);
-    //console.log(best);
+    console.log(best);
 
+    
     let wrGroup = [];
     for (let i = 0; i < maxGen; i++){
         while(wrGroup.length < wrGroupSize) {
@@ -179,6 +190,6 @@ function genAlg(citiesCord){
     }
     console.log("best way: ");
     console.log(best);
-
+    
 }
 
