@@ -88,12 +88,10 @@ export default{
             let cond = true;
             
             while (cond) {
-                // Создание пустых кластеров
                 for (let i = 0; i < this.numClusters; i++) {
                     clusters[i] = [];
                 }
 
-                // Распределение точек по кластерам
                 for (let i = 0; i < this.points.length; i++) {
                     let minDistance = Infinity;
                     let closestCluster = null;
@@ -107,7 +105,6 @@ export default{
                     clusters[closestCluster].push(this.points[i]);
                 }
 
-                // Пересчет центроидов
                 let newCentroids = [];
                 for (let i = 0; i < this.numClusters; i++) {
                 if (clusters[i].length > 0) {
@@ -121,7 +118,6 @@ export default{
                 }
                 }
 
-                // Проверка на завершение алгоритма
                 iterations++;
                 if (iterations > 100 || JSON.stringify(newCentroids) === JSON.stringify(centroids)) {
                     break;
@@ -141,13 +137,11 @@ export default{
         },
         hierarchicalClustering() {
             if(this.points.length == 0) {return;}
-            // Создание начальных кластеров из отдельных точек
             const canvas = this.$refs.canvas;
             this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
             let clusters = this.points.map(point => [point]);
 
             while (clusters.length > this.numClusters) {
-                // Вычисление расстояний между всеми кластерами
                 let distances = [];
                 for (let i = 0; i < clusters.length; i++) {
                     for (let j = i + 1; j < clusters.length; j++) {
@@ -156,11 +150,9 @@ export default{
                     }
                 }
 
-                // Нахождение пары кластеров с наименьшим расстоянием
                 let minDistance = Math.min(...distances.map(d => d.distance1));
                 let closestClusters = distances.filter(d => d.distance1 === minDistance)[0];
 
-                // Объединение пары кластеров в один
                 let newCluster = [...clusters[closestClusters.i], ...clusters[closestClusters.j]];
                 clusters.splice(closestClusters.j, 1);
                 clusters.splice(closestClusters.i, 1);
@@ -186,14 +178,12 @@ export default{
             let cond = true;
             
             while (cond) {
-                // Создание пустых кластеров
                 for (let i = 0; i < this.points.length; i++) {
                     clusters[i] = -1;
                 }
 
                 let clusterNum = 0;
 
-                // Распределение точек по кластерам
                 for (let i = 0; i < this.points.length; i++) {
                     if (clusters[i] !== -1) continue;
 

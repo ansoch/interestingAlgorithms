@@ -25,7 +25,6 @@
         }
         }
     
-        // вычисляем энтропию
         let entropy = 0;
         const total_count = data.length;
         for (let label in class_counts) {
@@ -39,20 +38,16 @@
     function calculateInformationGain(data, feature) {
         const total_entropy = calculateEntropy(data);
         
-        // разбиваем данные на две группы по значению признака
         const group_1 = data.filter(row => row[feature] === 0);
         const group_2 = data.filter(row => row[feature] === 1);
     
-        // вычисляем энтропию после разбиения
         const entropy_1 = calculateEntropy(group_1);
         const entropy_2 = calculateEntropy(group_2);
     
-        // вычисляем взвешенную сумму энтропий
         const weight_1 = group_1.length / data.length;
         const weight_2 = group_2.length / data.length;
         const weighted_entropy = weight_1 * entropy_1 + weight_2 * entropy_2;
     
-        // вычисляем информационный выигрыш
         const information_gain = total_entropy - weighted_entropy;
     
         return information_gain;
@@ -138,14 +133,12 @@
         },
         buildDecisionTree(data, features) { 
             const tree = { featureIndex: 0, children: [] };
-            // Проверяем, что все элементы в данных имеют одинаковый класс
             
             if (data.every((item) => item[item.length - 1] === data[0][data[0].length - 1])) {
                 tree.featureIndex = data[0].length - 1;
                 tree.children.push({value: data[0][data[0].length - 1], subtree: {value: data[0][data[0].length - 1]}, trueValue: data[0][data[0].length - 1], isRed: false});
                 return tree;
             }
-            // Проверяем, что больше не осталось признаков
             if (features.length === 0) {
                 const classCounts = {};
                 data.forEach((item) => {
@@ -162,7 +155,6 @@
                 return { value: maxClass};
             }
             
-            // Находим признак с максимальной информативностью
             let bestFeatureIndex = 0;
             let bestFeatureInfoGain = -1;
             for (let i = 0; i < features.length; i++) {
@@ -172,11 +164,9 @@
                     bestFeatureIndex = featureIndex;
                     bestFeatureInfoGain = infoGain;
                 }
-                //this.treeFeatures.push(bestFeatureIndex);
             }
             tree.featureIndex = bestFeatureIndex;
             
-            // Создаем узел дерева с выбранным признаком
             if (typeof(data[0][bestFeatureIndex]) === 'number'){
                 //const featureValues = new Set(data.map((item) => item[bestFeatureIndex]));
                 const newFeatures = features.filter((item) => item !== bestFeatureIndex);
@@ -201,16 +191,6 @@
                     tree.children.push({ value: value, subtree: subtree, trueValue: value, isRed: false });
                 });
             }
-            /* const newData = data.filter((item) => item[bestFeatureIndex] === value);
-                    let subtree = {};
-                    if(newFeatures.length != 0) {subtree = this.buildDecisionTree(newData, newFeatures)}
-                    tree.children.push({ value: value, subtree: subtree, trueValue: value, isRed: false });
-                    
-                    
-                    
-                    const newData = data.filter((item) => item[bestFeatureIndex] === value);
-                    const subtree = this.buildDecisionTree(newData, newFeatures);
-                    tree.children.push({ value: value, subtree: subtree, trueValue: value, isRed: false });*/
             
             return tree;
         },
@@ -245,7 +225,6 @@
 
             let isEnd = true;
             
-            // проходим по дереву до конечного узла, соответствующего запросу
             while (isEnd) {
                 const featureValue = request[currentNode.featureIndex];
                 let nextNode;
@@ -273,14 +252,13 @@
                 }
 
                 if (!nextNode) {
-                    break; // если не найден следующий узел, выходим из функции
+                    break; 
                 }
                 if(currentNode.children[0].value === nextNode.value) break;
                 currentNode = nextNode;
             }
             console.log(path);
             
-            // перекрашиваем все узлы на пути от корня до конечного узла
             for (let i = 0; i < path.length; i++) {
                 path[i].isRed = true;
                 console.log('xdd');
