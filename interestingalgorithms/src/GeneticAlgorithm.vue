@@ -1,9 +1,13 @@
 <template>
-    <div>
-        <CanvasPoints @canvasCreated="onCanvasCreated" @array-sent="onArraySent" ref="childCanvas"> </CanvasPoints>
+    <div class="app">
+        <div class="canvasPanel"><div class="panel"><CanvasPoints @canvasCreated="onCanvasCreated" @array-sent="onArraySent" ref="childCanvas"> </CanvasPoints></div></div>
+        <div class="panel">
+        <div class="buttons">
         <label>Число поколений</label> <input type = "number" v-model="gens" min = "10000" max = "1000000"/>
-        <div><button @click="genAlg(this.citiesCords)">test</button></div>
-    </div>
+        <div><button @click="genAlg(this.citiesCords)">Сгенерировать путь</button></div>
+        </div>
+        </div>
+    </div>    
 </template>
   
   <script>
@@ -185,7 +189,6 @@ import CanvasPoints from './CanvasPoints';
                 city.findCloseCities(numCities, numCloseCities, distCities);
                 cities.push(city);
             }
-
             let population = [];
             let bestDistance = 99999999;
             for (let i = 0; i < popSize; i++){
@@ -193,19 +196,24 @@ import CanvasPoints from './CanvasPoints';
                 tour.generateTour(numCities, numCloseCities, distCities, cities, chanceUseCloseCity);
                 population.push(tour);
             }
+            function drawWithDelay(citiesCord, population, i) {
+                setTimeout(() => {
+                    drawTour(citiesCord, population[i]);
+                }, 1000 * i);
+            }
             for (let i = 0; i < population.length; i++){
                 if(population[i].distance < bestDistance){
-                    drawTour(citiesCord, population[i]);
-                        bestDistance = population[i].distance;
-                        console.log("benis");
-                        console.log(population[i].distance);
+                    drawWithDelay(citiesCord, population, i);
+                    bestDistance = population[i].distance;
+                    console.log(population[i].distance);
+                    
                 }
             }
+            
             population.sort((a, b) => {return a.distance - b.distance});
             let best = population[0];
-            drawTour(citiesCord, best);
-            console.log(best.distance);
-            console.log("benis");
+            //drawTour(citiesCord, best);
+            console.log("best:", best.distance);
 
             let wrGroup = [];
             for (let i = 0; i < maxGen; i++){

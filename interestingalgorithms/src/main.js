@@ -2,13 +2,15 @@ import { createApp } from 'vue'
 import App from './App'
 import AntsAlgorithm from './AntsAlgorithm'
 import CanvasPoints from './CanvasPoints'
-import Tree from './Tree'
+import TreeAlgorithm from './TreeAlgorithm'
 import TreeNode from './Treenode'
-import Genetic from './Genetic'
+import GeneticAlgorithm from './GeneticAlgorithm'
+import ClusteringAlgorithms from './ClusteringAlgorithms'
 
 createApp(App).mount('#app')
 createApp(AntsAlgorithm).mount('#ants')
 createApp(CanvasPoints).mount('#CanvasPoints')
-createApp(Tree).mount('#tree')
+createApp(TreeAlgorithm).mount('#tree')
 createApp(TreeNode).mount('#treenode')
-createApp(Genetic).mount('#genetic')
+createApp(GeneticAlgorithm).mount('#genetic')
+createApp(ClusteringAlgorithms).mount('#clustering')

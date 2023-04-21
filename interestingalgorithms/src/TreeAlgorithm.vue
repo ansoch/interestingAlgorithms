@@ -1,13 +1,88 @@
 <template>
+    <div class="treeApp">
+    <div class="panel">
      <textarea id="csv-text" v-model="csvData"></textarea>
-     <div><button @click="printTree()">test</button></div>
+     <div><button @click="printTree()">Сгененерировать дерево</button></div>
+     <div>
+     <input type="text" v-model="csvInput"> 
+     </div>
+     <div><button @click="printRedTree()">Сгенерировать запрос</button></div>
+     </div>
      <div><tree-node :node="tree"></tree-node></div>
-     <input type="text" v-model="csvInput"> <button @click="printRedTree()">test</button>
+     </div>
 </template>
 
 <script>
     import TreeNode from './Treenode.vue'
-  export default {
+    function calculateEntropy(data) {
+        const class_counts = {};
+        for (let row of data) {
+        const label = row[row.length - 1];
+        if (label in class_counts) {
+            class_counts[label]++;
+        } else {
+            class_counts[label] = 1;
+        }
+        }
+    
+        // вычисляем энтропию
+        let entropy = 0;
+        const total_count = data.length;
+        for (let label in class_counts) {
+        const count = class_counts[label];
+        const probability = count / total_count;
+        entropy -= probability * Math.log2(probability);
+        }
+    
+        return entropy;
+    }
+    function calculateInformationGain(data, feature) {
+        const total_entropy = calculateEntropy(data);
+        
+        // разбиваем данные на две группы по значению признака
+        const group_1 = data.filter(row => row[feature] === 0);
+        const group_2 = data.filter(row => row[feature] === 1);
+    
+        // вычисляем энтропию после разбиения
+        const entropy_1 = calculateEntropy(group_1);
+        const entropy_2 = calculateEntropy(group_2);
+    
+        // вычисляем взвешенную сумму энтропий
+        const weight_1 = group_1.length / data.length;
+        const weight_2 = group_2.length / data.length;
+        const weighted_entropy = weight_1 * entropy_1 + weight_2 * entropy_2;
+    
+        // вычисляем информационный выигрыш
+        const information_gain = total_entropy - weighted_entropy;
+    
+        return information_gain;
+    }
+    function calculateInformationGainSeparated(data, featureIndex, leftData, rightData) {
+        const totalEntropy = calculateEntropy(data);
+        const leftEntropy = calculateEntropy(leftData);
+        const rightEntropy = calculateEntropy(rightData);
+        const leftWeight = leftData.length / data.length;
+        const rightWeight = rightData.length / data.length;
+        const informationGain = totalEntropy - (leftWeight * leftEntropy) - (rightWeight * rightEntropy);
+        return informationGain;
+    }
+    function findThreshold(data, featureIndex) {
+        const values = data.map((item) => item[featureIndex]).sort();
+        let bestThreshold = null;
+        let bestInfoGain = -1;
+        for (let i = 0; i < values.length - 1; i++) {
+            const threshold = (values[i] + values[i + 1]) / 2;
+            const leftData = data.filter((item) => item[featureIndex] <= threshold);
+            const rightData = data.filter((item) => item[featureIndex] > threshold);
+            const infoGain = calculateInformationGainSeparated(data, featureIndex, leftData, rightData);
+            if (infoGain > bestInfoGain) {
+            bestThreshold = threshold;
+            bestInfoGain = infoGain;
+            }
+        }
+        return bestThreshold;
+    }
+    export default {
     name: "TreeAlgorithm",
     components: {
         TreeNode
@@ -46,9 +121,6 @@
         }   
     },
     methods:{
-        butt(){
-            console.log(this.csvData);
-        },
         csvToFeatures(){
             let rows = this.csvData.split('\n');
             this.data = [];
@@ -64,75 +136,7 @@
                 }
             }
         },
-        buildDecisionTree(data, features) {
-            function calculateEntropy(data) {
-                const class_counts = {};
-                for (let row of data) {
-                const label = row[row.length - 1];
-                if (label in class_counts) {
-                    class_counts[label]++;
-                } else {
-                    class_counts[label] = 1;
-                }
-                }
-            
-                // вычисляем энтропию
-                let entropy = 0;
-                const total_count = data.length;
-                for (let label in class_counts) {
-                const count = class_counts[label];
-                const probability = count / total_count;
-                entropy -= probability * Math.log2(probability);
-                }
-            
-                return entropy;
-            }
-            function calculateInformationGain(data, feature) {
-                const total_entropy = calculateEntropy(data);
-                
-                // разбиваем данные на две группы по значению признака
-                const group_1 = data.filter(row => row[feature] === 0);
-                const group_2 = data.filter(row => row[feature] === 1);
-            
-                // вычисляем энтропию после разбиения
-                const entropy_1 = calculateEntropy(group_1);
-                const entropy_2 = calculateEntropy(group_2);
-            
-                // вычисляем взвешенную сумму энтропий
-                const weight_1 = group_1.length / data.length;
-                const weight_2 = group_2.length / data.length;
-                const weighted_entropy = weight_1 * entropy_1 + weight_2 * entropy_2;
-            
-                // вычисляем информационный выигрыш
-                const information_gain = total_entropy - weighted_entropy;
-            
-                return information_gain;
-            }
-            function calculateInformationGain1(data, featureIndex, leftData, rightData) {
-                const totalEntropy = calculateEntropy(data);
-                const leftEntropy = calculateEntropy(leftData);
-                const rightEntropy = calculateEntropy(rightData);
-                const leftWeight = leftData.length / data.length;
-                const rightWeight = rightData.length / data.length;
-                const informationGain = totalEntropy - (leftWeight * leftEntropy) - (rightWeight * rightEntropy);
-                return informationGain;
-            }
-            function findThreshold(data, featureIndex) {
-                const values = data.map((item) => item[featureIndex]).sort();
-                let bestThreshold = null;
-                let bestInfoGain = -1;
-                for (let i = 0; i < values.length - 1; i++) {
-                    const threshold = (values[i] + values[i + 1]) / 2;
-                    const leftData = data.filter((item) => item[featureIndex] <= threshold);
-                    const rightData = data.filter((item) => item[featureIndex] > threshold);
-                    const infoGain = calculateInformationGain1(data, featureIndex, leftData, rightData);
-                    if (infoGain > bestInfoGain) {
-                    bestThreshold = threshold;
-                    bestInfoGain = infoGain;
-                    }
-                }
-                return bestThreshold;
-            } 
+        buildDecisionTree(data, features) { 
             const tree = { featureIndex: 0, children: [] };
             // Проверяем, что все элементы в данных имеют одинаковый класс
             
@@ -288,4 +292,14 @@
   };
   </script>
 
-<style></style>
+<style>
+textarea {
+  height: 350px;
+  width: 250px;
+}
+.treeApp{
+    display: flex;
+    align-items: flex-start;
+    height: 100vh;
+}
+</style>

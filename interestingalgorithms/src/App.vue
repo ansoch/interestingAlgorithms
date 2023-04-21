@@ -1,236 +1,55 @@
 <template>
-    <div>
-        <div class="app">
-        <div class="canvasPanel"><div class="panel"><canvas ref="canvas" @click="draw" width="640" height="640" style="border:3px solid #404345; border-radius: 10px;"></canvas></div></div>
-        <div class="buttonPanel">
-        <div class="panel">
-        <div class="buttons">
-        <input type="range" min="2" max="10" v-model="numClusters">
-        <button @click="kMeansClustering()">kmeans</button>
-        <button @click="hierarchicalClustering()">hierarchical</button>
-        <button @click="clearPoints()">очистить точки</button>
-        </div>
-        </div>
-        </div>
-        </div>
+    <div class="leftPanel">
+    <div class="panel">
+        <button @click="changeAlgorithm('clusters')">Кластеризация</button>
+        <button @click="changeAlgorithm('ants')">Муравьиный алгоритм</button>
+        <button @click="changeAlgorithm('genetic')">Генетический алгоритм</button>
+        <button @click="changeAlgorithm('tree')">Дерево решений</button>
+        
+    </div>
+    </div>
+    <div v-if="activeComponent === 'clusters'">
+      <ClusteringAlgorithms />
+    </div>
+    <div v-if="activeComponent === 'ants'">
+      <AntsAlgorithm />
+    </div>
+    <div v-if="activeComponent === 'genetic'">
+      <GeneticAlgorithm />
+    </div>
+    <div v-if="activeComponent === 'tree'">
+      <TreeAlgorithm />
     </div>
 </template>
 
 <script>
+import AntsAlgorithm from './AntsAlgorithm'
+import TreeAlgorithm from './TreeAlgorithm'
+import GeneticAlgorithm from './GeneticAlgorithm'
+import ClusteringAlgorithms from './ClusteringAlgorithms'
 export default{
+    components:{
+        AntsAlgorithm, ClusteringAlgorithms, GeneticAlgorithm, TreeAlgorithm
+    },
     data(){
         return {
-            points: [],
-            vueCanvas: null,
-            colors: ['#45283c', '#663931', '#8f563b', '#df7126', '#jc3232', '#d9j066', '#696j6a', '#9bjdb7', '#306082', '#76428j'], 
-            kmeansColors: ['black', 'blue', 'red', 'yellow', 'green', 'maroon', 'navy', 'lime', 'purple', 'olive'], 
-            hiersColors: ['olive', 'purple', 'lime', 'navy', 'maroon', 'green', 'yellow', 'red', 'blue', 'black'], 
-            numClusters: 2,
+            activeComponent: 'ClusteringAlgorithms',
         }
     },
-    mounted(){
-        const canvas = this.$refs.canvas;
-        const ctx = canvas.getContext('2d');
-        this.vueCanvas = ctx;
-    },
-    methods: {
-        draw(event) {
-            const canvas = this.$refs.canvas;
-            const context = this.vueCanvas;
-            const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            for(let point of this.points){
-                if(this.distance({x, y}, point) < 30) return;
-            }
-
-            context.beginPath();
-            context.arc(x, y, 15, 0, 2 * Math.PI);
-            context.fillStyle = 'black';
-            context.fill();
-            
-            this.points.push({ x, y });
-        }, 
-        distance(point1, point2) {
-            const dx = point1.x - point2.x;
-            const dy = point1.y - point2.y;
-            return Math.sqrt(dx * dx + dy * dy);
-        },
-        initCentroids(points, numClusters) {
-            const centroids = [];
-            for (let i = 0; i < numClusters; i++) {
-                centroids.push(points[Math.floor(Math.random() * points.length)]);
-            }
-            return centroids;
-        },
-        initMedoids(points, numClusters) {
-            const medoids = [];
-            for (let i = 0; i < numClusters; i++) {
-                let randomIndex = Math.floor(Math.random() * points.length);
-                while (medoids.includes(points[randomIndex])) {
-                    randomIndex = Math.floor(Math.random() * points.length);
-                }
-                medoids.push(points[randomIndex]);
-            }
-            return medoids;
-        },
-        kMeansClustering() {
-            const canvas = this.$refs.canvas;
-            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
-            let centroids = this.initCentroids(this.points, this.numClusters);
-            let clusters = [];
-            let iterations = 0;
-
-            let cond = true;
-            
-            while (cond) {
-                // Создание пустых кластеров
-                for (let i = 0; i < this.numClusters; i++) {
-                    clusters[i] = [];
-                }
-
-                // Распределение точек по кластерам
-                for (let i = 0; i < this.points.length; i++) {
-                    let minDistance = Infinity;
-                    let closestCluster = null;
-                    for (let j = 0; j < centroids.length; j++) {
-                        const d = this.distance(this.points[i], centroids[j]);
-                        if (d < minDistance) {
-                            minDistance = d;
-                            closestCluster = j;
-                        }
-                    }
-                    clusters[closestCluster].push(this.points[i]);
-                }
-
-                // Пересчет центроидов
-                let newCentroids = [];
-                for (let i = 0; i < this.numClusters; i++) {
-                if (clusters[i].length > 0) {
-                    const sumX = clusters[i].reduce((acc, point) => acc + point.x, 0);
-                    const sumY = clusters[i].reduce((acc, point) => acc + point.y, 0);
-                    const centroidX = sumX / clusters[i].length;
-                    const centroidY = sumY / clusters[i].length;
-                    newCentroids.push({ x: centroidX, y: centroidY });
-                } else {
-                    newCentroids.push(centroids[i]);
-                }
-                }
-
-                // Проверка на завершение алгоритма
-                iterations++;
-                if (iterations > 100 || JSON.stringify(newCentroids) === JSON.stringify(centroids)) {
-                    break;
-                }
-                centroids = newCentroids;
-            }
-            for(let i = 0; i < this.numClusters; i++){
-                for(let j = 0; j < clusters[i].length; j++){
-                    this.vueCanvas.beginPath();
-                    this.vueCanvas.arc(clusters[i][j].x, clusters[i][j].y, 15, 0, 2 * Math.PI);
-                    this.vueCanvas.fillStyle = this.kmeansColors[i];
-                    this.vueCanvas.fill();
-                    this.vueCanvas.closePath();
-                }
-            }
-            console.log(clusters);
-        },
-        hierarchicalClustering() {
-            if(this.points.length == 0) {return;}
-            // Создание начальных кластеров из отдельных точек
-            const canvas = this.$refs.canvas;
-            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
-            let clusters = this.points.map(point => [point]);
-
-            while (clusters.length > this.numClusters) {
-                // Вычисление расстояний между всеми кластерами
-                let distances = [];
-                for (let i = 0; i < clusters.length; i++) {
-                    for (let j = i + 1; j < clusters.length; j++) {
-                        let distance1 = Math.min(...clusters[i].map(point1 => Math.min(...clusters[j].map(point2 => this.distance(point1, point2)))));
-                            distances.push({ i, j, distance1 });
-                    }
-                }
-
-                // Нахождение пары кластеров с наименьшим расстоянием
-                let minDistance = Math.min(...distances.map(d => d.distance1));
-                let closestClusters = distances.filter(d => d.distance1 === minDistance)[0];
-
-                // Объединение пары кластеров в один
-                let newCluster = [...clusters[closestClusters.i], ...clusters[closestClusters.j]];
-                clusters.splice(closestClusters.j, 1);
-                clusters.splice(closestClusters.i, 1);
-                clusters.push(newCluster);
-            }
-            for(let i = 0; i < this.numClusters & i < this.points.length; i++){
-                for(let j = 0; j < clusters[i].length; j++){
-                    this.vueCanvas.beginPath();
-                    this.vueCanvas.arc(clusters[i][j].x, clusters[i][j].y, 15, 0, 2 * Math.PI);
-                    this.vueCanvas.fillStyle = this.kmeansColors[i];
-                    this.vueCanvas.fill();
-                    this.vueCanvas.closePath();
-                }
-            }
-            console.log(clusters);
-        },
-        clearPoints(){
-            const canvas = this.$refs.canvas;
-            this.points = [];
-            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+    methods:{
+        changeAlgorithm(component){
+            this.activeComponent = component;
         }
     }
 }
 </script>
 
 <style>
-.buttons{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+body {
+  font-family: Arial, sans-serif;
 }
-.app{
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 100vh;
-}
-.canvasPanel{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.buttonPanel{
-    margin-left: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-end;
-}
-.panel{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: fit-content;
-    width: fit-content;
-    background-color: #b2bccf;
-    border-radius: 10px;
-    padding: 15px;
-}
-button{
-    background: none;
-    align-self: flex-end;
-    border: 1px solid black;
-    padding: 5px 5px;
-    margin-left: 5px;
-    border-radius: 4px;
-}
-button:hover {
-  background-color: #cbdbfc; /* цвет кнопки при наведении */
-}
-canvas{
-    background-color: white;
+.leftPanel{
+    float:left;
+    margin: 5px
 }
 </style>

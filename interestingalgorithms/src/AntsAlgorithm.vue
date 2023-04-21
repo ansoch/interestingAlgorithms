@@ -1,6 +1,8 @@
 <template>
-    <CanvasPoints @canvasCreated="onCanvasCreated" @array-sent="onArraySent" ref="childCanvas"> </CanvasPoints>
-    <div><button @click="antAlg(this.citiesCords)">test</button></div>
+    <div class="app">
+    <div class="canvasPanel"><div class="panel"><CanvasPoints @canvasCreated="onCanvasCreated" @array-sent="onArraySent" ref="childCanvas"> </CanvasPoints></div></div>
+    <div class="panel"> <div class="buttons"><button @click="antAlg(this.citiesCords)">Сгенерировать путь</button></div></div>
+    </div>
 </template>
   
 <script>
