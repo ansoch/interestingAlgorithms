@@ -1,0 +1,73 @@
+.settings {
+    height: 100%;
+    width: 230px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    padding-top: 90px;
+    margin-left: 180px;
+    background-color: #818181;
+
+}
+.settings button{
+    width: 100%;
+    background-color: #3c829a;
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #e8e8e8;
+    display: block;
+    border: 1px solid #818181;
+}
+.settings input {
+    background-color: #3c829a;
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #000000;
+    display: block;
+    border: 1px solid #818181;
+}
+
+.main {
+    margin-left: 420px;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    'background-color: #a2a2a2;
+}
+.main p{
+    width: 100%;
+    font-size: 35px;
+    padding-left: 30%;
+    'color: #ffffff;
+
+}
+.main canvas{
+    background-color: #c9bebe;
+}
+.sidenav {
+    height: 100%;
+    width: 170px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #818181;
+    padding-top: 90px;
+}
+
+.sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #ffffff;
+    display: block;
+    background-color: #3c829a;
+    border: 1px solid #818181;
+
+}

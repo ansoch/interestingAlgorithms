@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset = "utf-8">
+    <link rel="stylesheet" href = "goslingCSS.css">
+    <title>A*</title>
+</head>
+<body>
+
+    <div class="sidenav">
+        <a href="genetic.html">ГЕНЕТИКА</a>
+        <a href="ants.html">МУРАВЬИ</a>
+        <a href="astar.html">A*</a>
+        <a href="clusters.html">КЛАСТЕРЫ</a>
+        <a href="">ДЕРЕВЬЯ</a>
+        <a href="">НЕЙРОСЕТЬ</a>
+    </div>
+
+    <div class="main">
+        <p>А*</p>
+        <canvas id="canvas" height="600" width="600" style="border: 1px solid black;"></canvas>
+    </div>>
+
+    <div class="settings">
+    <button type="button" onclick="" id="startpoint">Установить точку начала</button>
+    <button type="button" onclick="" id="endpoint">Установить точку конца</button>
+    <button type="button" onclick="" id="search">Запустить алгоритм</button>
+    <button type="button" onclick="" id="modify">Модифицировать лабиринт</button>
+    <button type="button" onclick="generate();" id="generate">Сгенерировать новый лабиринт</button>
+    <label>Размер лабиринта</label><input type="range" id="size" min="5" max="20" step="1" value="10">
+    </div>
+
+    <script type="module">
+        //import {generateMaze} from "./mazeGenerator.js";
+        //import {findPath} from "./aStarAlgo.js";
+        const canvas = document.getElementById('canvas');
+        const spointbutton = document.getElementById('startpoint');
+        const epointbutton = document.getElementById('endpoint');
+        const searchbutton = document.getElementById('search');
+        const modifybutton = document.getElementById('modify');
+        const generatebutton = document.getElementById('generate');
+        const sizebutton = document.getElementById('size')
+        const ctx = canvas.getContext('2d');
+        let maze = [];
+        let n = sizebutton.value;
+        let s = (600 / (2 * n + 1));
+        let spoint = [1, 1];
+        let epoint = [2 * n - 1, 2 * n - 1];
+        let mapMode = 'none';
+        generatebutton.onclick = function(){
+            n = sizebutton.value;
+            s = (600 / (2 * n + 1));
+            generate(n);
+        };
+        searchbutton.onclick = function(){drawPath()};
+
+        canvas.onclick = function(event){
+            let x = event.offsetX;
+            let y = event.offsetY;
+            if(mapMode === 'none') return;
+            let xcell = Math.floor(x / s);
+            let ycell = Math.floor(y / s);
+            if(mapMode === 'start') spoint = [xcell, ycell];
+            else if(mapMode === 'end') epoint = [xcell, ycell];
+            else if(mapMode === 'walls') {
+                if(maze[xcell][ycell] === 1) maze[xcell][ycell] = 0;
+                else maze[xcell][ycell] = 1;
+            }
+            if(mapMode !== 'walls') mapMode = "none";
+            drawMaze()
+        };
+        spointbutton.onclick = function(){mapMode = 'start'};
+        epointbutton.onclick = function(){mapMode = 'end'};
+        modifybutton.onclick = function(){
+            if(mapMode !== 'walls') mapMode = 'walls';
+            else mapMode = 'none';
+        }
+
+        function generate(n) {
+            maze = generateMaze(n, n)['maze'];
+            drawMaze();
+        }
+
+        function drawMaze() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 600, 600);
+            ctx.fillStyle = 'black';
+            for(let i = 0; i < 2 * n + 1; i++) {
+                for(let j = 0; j < 2 * n + 1; j++) {
+                    if(maze[i][j] === 0) {
+                        ctx.fillRect(i * s, j * s, s, s);
+                    }
+                }
+            }
+            ctx.fillStyle = "blue";
+            ctx.fillRect(spoint[0] * s, spoint[1] * s, s, s);
+            ctx.fillStyle = "red";
+            ctx.fillRect(epoint[0] * s, epoint[1] * s, s, s);
+        }
+
+        function drawPath() {
+            const path = findPath(maze, spoint, epoint);
+            ctx.fillStyle = 'orange';
+            for(let i = 0; i < path['optimal'].length; i++) {
+                ctx.fillRect(path['optimal'][i][0] * s, path['optimal'][i][1] * s, s, s);
+            }
+        }
+        generate(n);
+    </script>
+    <script src = aStarAlgo.js></script>
+    <script src = mazeGenerator.js></script>
+</body>
+</html>

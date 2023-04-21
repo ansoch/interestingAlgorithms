@@ -1,12 +1,11 @@
 <template>
     <div class="leftPanel">
-    <div class="panel">
         <button @click="changeAlgorithm('clusters')">Кластеризация</button>
         <button @click="changeAlgorithm('ants')">Муравьиный алгоритм</button>
         <button @click="changeAlgorithm('genetic')">Генетический алгоритм</button>
         <button @click="changeAlgorithm('tree')">Дерево решений</button>
-        
-    </div>
+        <a href="/good/genetic.html">Другие страницы</a>
+        <a href="/good/templates/index.html">Нейронная сеть</a>
     </div>
     <div v-if="activeComponent === 'clusters'">
       <ClusteringAlgorithms />
@@ -49,7 +48,17 @@ body {
   font-family: Arial, sans-serif;
 }
 .leftPanel{
+    display: flex;
+    flex-direction: column;
     float:left;
-    margin: 5px
+    margin: 5px;
+    
+    align-items: center;
+    height: 100vh;
+    width: fit-content;
+    background-color: #b2bccf;
+    border-radius: 10px;
+    padding: 15px;
+    margin-left: 5px;
 }
 </style>
