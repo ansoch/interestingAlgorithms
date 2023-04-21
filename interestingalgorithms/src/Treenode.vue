@@ -22,6 +22,6 @@
 
 <style>
 .red-branch {
-    color: red;
+  color: red;
 }
 </style>
