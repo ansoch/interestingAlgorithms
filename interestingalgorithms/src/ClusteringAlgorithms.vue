@@ -173,10 +173,6 @@ export default{
             const canvas = this.$refs.canvas;
             this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);*/
             let tempclusters = [];
-            //let iterations = 0;
-
-            //let cond = true;
-            
             
             for (let i = 0; i < this.points.length; i++) {
                 tempclusters[i] = -1;

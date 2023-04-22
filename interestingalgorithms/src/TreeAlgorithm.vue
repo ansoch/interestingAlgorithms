@@ -35,22 +35,24 @@
     
         return entropy;
     }
+    //прикол
+    // eslint-disable-next-line no-unused-vars
     function calculateInformationGain(data, feature) {
-        const total_entropy = calculateEntropy(data);
+        const totalEntropy = calculateEntropy(data);
         
         const group_1 = data.filter(row => row[feature] === 0);
         const group_2 = data.filter(row => row[feature] === 1);
-    
         const entropy_1 = calculateEntropy(group_1);
         const entropy_2 = calculateEntropy(group_2);
     
         const weight_1 = group_1.length / data.length;
         const weight_2 = group_2.length / data.length;
-        const weighted_entropy = weight_1 * entropy_1 + weight_2 * entropy_2;
+        const weightedEntropy = weight_1 * entropy_1 + weight_2 * entropy_2;
     
-        const information_gain = total_entropy - weighted_entropy;
+        const informationGain = totalEntropy - weightedEntropy;
+        console.log(informationGain);
     
-        return information_gain;
+        return informationGain;
     }
     function calculateInformationGainSeparated(data, featureIndex, leftData, rightData) {
         const totalEntropy = calculateEntropy(data);
@@ -159,7 +161,7 @@
             let bestFeatureInfoGain = -1;
             for (let i = 0; i < features.length; i++) {
                 const featureIndex = features[i];
-                const infoGain = calculateInformationGain(data, featureIndex);
+                const infoGain = calculateEntropy(data, featureIndex);
                 if (infoGain > bestFeatureInfoGain) {
                     bestFeatureIndex = featureIndex;
                     bestFeatureInfoGain = infoGain;

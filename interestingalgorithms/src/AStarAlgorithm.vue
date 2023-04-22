@@ -1,7 +1,9 @@
 <template>
     <div class="app">
         <div class="panel"><canvas id="canvas" height="600" width="600" style="border: 1px solid black;"></canvas></div>
-        <div class="panel"><div class="buttons"></div></div>
+        <div class="panel"><div class="buttons">
+            
+        </div></div>
     </div>
 </template>
 
@@ -196,7 +198,14 @@ function getNear(point, visited, size) {
 
 //export {generateMaze};
 
+export default {
+    name: "AStarAlgorithm",
+    data(){
+        return{
 
+        }
+    }
+}
 </script>
 
 <style></style>
