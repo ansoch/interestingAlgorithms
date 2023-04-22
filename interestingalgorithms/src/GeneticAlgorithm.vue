@@ -5,6 +5,7 @@
         <div class="buttons">
         <label>Число поколений</label> <input type = "number" v-model="gens" min = "10000" max = "1000000"/>
         <div><button @click="genAlg(this.citiesCords)">Сгенерировать путь</button></div>
+        <div v-if="this.works === true"><div>Алгоритм работает</div></div>
         </div>
         </div>
     </div>    
@@ -24,7 +25,8 @@ import CanvasPoints from './CanvasPoints';
         canvas: null,
         ctx: null,
         gens: 0,
-        citiesCords: []
+        citiesCords: [],
+        works: false
       };
     },
     methods: {
@@ -199,8 +201,10 @@ import CanvasPoints from './CanvasPoints';
             function drawWithDelay(citiesCord, population, i) {
                 setTimeout(() => {
                     drawTour(citiesCord, population[i]);
-                }, 1000 * i);
+                }, 100 * i);
             }
+
+            this.works = true;
             for (let i = 0; i < population.length; i++){
                 if(population[i].distance < bestDistance){
                     drawWithDelay(citiesCord, population, i);
@@ -209,6 +213,7 @@ import CanvasPoints from './CanvasPoints';
                     
                 }
             }
+            this.works=false;
             
             population.sort((a, b) => {return a.distance - b.distance});
             let best = population[0];

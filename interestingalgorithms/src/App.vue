@@ -4,8 +4,10 @@
         <button @click="changeAlgorithm('ants')">Муравьиный алгоритм</button>
         <button @click="changeAlgorithm('genetic')">Генетический алгоритм</button>
         <button @click="changeAlgorithm('tree')">Дерево решений</button>
+        <div class="links">
         <a href="/good/genetic.html">Другие страницы</a>
         <a href="/good/templates/index.html">Нейронная сеть</a>
+        </div>
     </div>
     <div v-if="activeComponent === 'clusters'">
       <ClusteringAlgorithms />
@@ -32,7 +34,7 @@ export default{
     },
     data(){
         return {
-            activeComponent: 'ClusteringAlgorithms',
+            activeComponent: 'clusters',
         }
     },
     methods:{
@@ -47,6 +49,13 @@ export default{
 body {
   font-family: Arial, sans-serif;
 }
+.links{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+}
 .leftPanel{
     display: flex;
     flex-direction: column;
@@ -56,7 +65,7 @@ body {
     align-items: center;
     height: 100vh;
     width: fit-content;
-    background-color: #b2bccf;
+    background-color: #e1ecf2;
     border-radius: 10px;
     padding: 15px;
     margin-left: 5px;

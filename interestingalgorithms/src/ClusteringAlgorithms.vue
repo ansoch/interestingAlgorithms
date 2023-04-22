@@ -5,11 +5,13 @@
         <div class="buttonPanel">
         <div class="panel">
         <div class="buttons">
+        <label>Число кластеров</label>
         <input type="range" min="2" max="10" v-model="numClusters">
-        <button @click="kMeansClustering()">kmeans</button>
-        <button @click="hierarchicalClustering()">hierarchical</button>
-        <button @click="dbscanClustering()">DBSCAN</button>
-        <button @click="clearPoints()">очистить точки</button>
+        <button @click="drawClusters(kMeansClustering(), this.kmeansColors)">kmeans</button>
+        <button @click="drawClusters(hierarchicalClustering(), this.hiersColors) ">hierarchical</button>
+        <button @click="drawClusters(dbscanClustering(), this.dbscanColors, this.dbscanNumClusters)">DBSCAN</button>
+        <button @click="drawComparison()">Сравнение алгоритмов</button>
+        <button @click="clearPoints()">Очистить точки</button>
         </div>
         </div>
         </div>
@@ -29,6 +31,7 @@ export default{
             hiersColors: ['olive', 'purple', 'lime', 'navy', 'maroon', 'green', 'yellow', 'black', 'blue', 'red'], 
             dbscanColors: ['maroon', 'green', 'purple', 'red', 'olive', 'black', 'yellow', 'blue', 'navy', 'lime'],
             numClusters: 2,
+            dbscanNumClusters: 3
         }
     },
     mounted(){
@@ -67,23 +70,14 @@ export default{
             }
             return centroids;
         },
-        initMedoids(points, numClusters) {
-            const medoids = [];
-            for (let i = 0; i < numClusters; i++) {
-                let randomIndex = Math.floor(Math.random() * points.length);
-                while (medoids.includes(points[randomIndex])) {
-                    randomIndex = Math.floor(Math.random() * points.length);
-                }
-                medoids.push(points[randomIndex]);
-            }
-            return medoids;
-        },
         kMeansClustering() {
+            /*
             const canvas = this.$refs.canvas;
-            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);*/
             let centroids = this.initCentroids(this.points, this.numClusters);
             let clusters = [];
             let iterations = 0;
+            
 
             let cond = true;
             
@@ -124,6 +118,7 @@ export default{
                 }
                 centroids = newCentroids;
             }
+            /*
             for(let i = 0; i < this.numClusters; i++){
                 for(let j = 0; j < clusters[i].length; j++){
                     this.vueCanvas.beginPath();
@@ -132,13 +127,15 @@ export default{
                     this.vueCanvas.fill();
                     this.vueCanvas.closePath();
                 }
-            }
+            }*/
             console.log(clusters);
+            return clusters;
         },
         hierarchicalClustering() {
             if(this.points.length == 0) {return;}
+            /*
             const canvas = this.$refs.canvas;
-            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);*/
             let clusters = this.points.map(point => [point]);
 
             while (clusters.length > this.numClusters) {
@@ -158,6 +155,7 @@ export default{
                 clusters.splice(closestClusters.i, 1);
                 clusters.push(newCluster);
             }
+            /*
             for(let i = 0; i < this.numClusters & i < this.points.length; i++){
                 for(let j = 0; j < clusters[i].length; j++){
                     this.vueCanvas.beginPath();
@@ -166,49 +164,49 @@ export default{
                     this.vueCanvas.fill();
                     this.vueCanvas.closePath();
                 }
-            }
+            }*/
             console.log(clusters);
+            return clusters;
         },
         dbscanClustering() {
+            /*
             const canvas = this.$refs.canvas;
-            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
-            let clusters = [];
-            let iterations = 0;
+            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);*/
+            let tempclusters = [];
+            //let iterations = 0;
 
-            let cond = true;
+            //let cond = true;
             
-            while (cond) {
-                for (let i = 0; i < this.points.length; i++) {
-                    clusters[i] = -1;
-                }
-
-                let clusterNum = 0;
-
-                for (let i = 0; i < this.points.length; i++) {
-                    if (clusters[i] !== -1) continue;
-
-                    let neighbors = this.getNeighbors(i, 250);
-
-                    if (neighbors.length < 3) {
-                        clusters[i] = 0;
-                        continue;
-                    }
-
-                    clusterNum++;
-                    this.expandCluster(i, neighbors, clusterNum, clusters);
-                }
-
-                // Проверка на завершение алгоритма
-                iterations++;
-                if (iterations > 100) {
-                    break;
-                }
+            
+            for (let i = 0; i < this.points.length; i++) {
+                tempclusters[i] = -1;
             }
 
+            let clusterNum = 0;
+
+            for (let i = 0; i < this.points.length; i++) {
+                if (tempclusters[i] !== -1) continue;
+
+                let neighbors = this.getNeighbors(i, 250);
+
+                if (neighbors.length < 3) {
+                    tempclusters[i] = 0;
+                    continue;
+                }
+
+                clusterNum++;
+                this.expandCluster(i, neighbors, clusterNum, tempclusters);
+            }
+            let clusters = Array.from({ length: clusterNum+1 }, () => []);
+            for(let i = 0; i < this.points.length; i++){
+                clusters[tempclusters[i]].push(this.points[i]);
+            }
+            this.dbscanNumClusters = clusterNum+1;
+            /*
             for(let i = 0; i < this.points.length; i++){
                 this.vueCanvas.beginPath();
                 this.vueCanvas.arc(this.points[i].x, this.points[i].y, 15, 0, 2 * Math.PI);
-                if(clusters[i] === 0) {
+                if(tempclusters[i] === 0) {
                     this.vueCanvas.fillStyle = "black";
                 } else {
                     this.vueCanvas.fillStyle = this.dbscanColors[clusters[i] % this.dbscanColors.length];
@@ -216,15 +214,26 @@ export default{
                 this.vueCanvas.fill();
                 this.vueCanvas.closePath();
             }
+            */
+           /*
+            for(let i = 0; i < clusterNum+1 & i < this.points.length; i++){
+                for(let j = 0; j < clusters[i].length; j++){
+                    this.vueCanvas.beginPath();
+                    this.vueCanvas.arc(clusters[i][j].x, clusters[i][j].y, 15, 0, 2 * Math.PI);
+                    this.vueCanvas.fillStyle = this.dbscanColors[i];
+                    this.vueCanvas.fill();
+                    this.vueCanvas.closePath();
+                }
+            }*/
             console.log(clusters);
+            return clusters;
         },
         getNeighbors(pointIndex, epsilon) {
             let neighbors = [];
             for(let i = 0; i < this.points.length; i++) {
                 if(i === pointIndex) continue;
 
-                const d = this.distance(this.points[i], this.points[pointIndex]);
-                if(d < epsilon) {
+                if(this.distance(this.points[i], this.points[pointIndex]) < epsilon) {
                     neighbors.push(i);
                 }
             }
@@ -249,6 +258,28 @@ export default{
             const canvas = this.$refs.canvas;
             this.points = [];
             this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+        },
+        drawClusters(clusters, colors, num = this.numClusters, angle1 = 0, angle2 = 2 * Math.PI, erase = true){
+            if(erase){
+                const canvas = this.$refs.canvas;
+                this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            for(let i = 0; i < num & i < this.points.length; i++){
+                for(let j = 0; j < clusters[i].length; j++){
+                    this.vueCanvas.beginPath();
+                    this.vueCanvas.arc(clusters[i][j].x, clusters[i][j].y, 15, angle1, angle2);
+                    this.vueCanvas.fillStyle = colors[i];
+                    this.vueCanvas.fill();
+                    this.vueCanvas.closePath();
+                }
+            }
+        },
+        drawComparison(){
+            const canvas = this.$refs.canvas;
+            this.vueCanvas.clearRect(0, 0, canvas.width, canvas.height);
+            this.drawClusters(this.dbscanClustering(), this.dbscanColors, this.dbscanNumClusters, 4*Math.PI/3, 2*Math.PI, false);
+            this.drawClusters(this.hierarchicalClustering(), this.hiersColors, this.numClusters, 2*Math.PI/3, 4*Math.PI/3, false);
+            this.drawClusters(this.kMeansClustering(), this.kmeansColors, this.numClusters, 0, 2*Math.PI/3, false)
         }
     }
 }
@@ -260,11 +291,12 @@ button{
     height: 40px;
     background-color: white;
     align-self: flex-end;
-    border: 1px solid black;
+    border: 0px solid black;
     padding: 5px 5px;
     margin-bottom: 5px;
     border-radius: 4px;
     margin-top: 5px;
+    transition: background-color 0.22s ease-in-out;
 }
 input{
     margin-bottom: 5px;
@@ -300,9 +332,9 @@ input{
     align-items: center;
     height: fit-content;
     width: fit-content;
-    background-color: #b2bccf;
+    background-color: #e1ecf2;
     border-radius: 10px;
-    padding: 15px;
+    padding: 7px;
     margin-left: 5px;
 }
 .panel button{
@@ -311,6 +343,7 @@ input{
 }
 button:hover {
   background-color: #cbdbfc; /* цвет кнопки при наведении */
+  
 }
 canvas{
     background-color: white;
