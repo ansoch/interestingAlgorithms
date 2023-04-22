@@ -69,32 +69,15 @@ function pheromoneUpdate(iter, numCities, pheromone, pheromoneConst, pheromoneRe
     }
     return pheromone;
 }
-function drawTour(citiesCoords, tour){
-    clearCanvas();
-    restore(citiesCoords);
-    ctx.beginPath();
-    ctx.moveTo(citiesCoords[tour.tour[0]][0], citiesCoords[tour.tour[0]][1]);
-    for(let i = 1; i < tour.tour.length; i++){
-        ctx.lineTo(citiesCoords[tour.tour[i]][0], citiesCoords[tour.tour[i]][1])
-    }
-    ctx.stroke();
-}
+
 
 function antAlg(citiesCords) {
     let distCities = getDist(citiesCords);
     let numCities = citiesCords.length;
-    //
-    let alpha = 1;
-    let beta = 3;
-    let closeConst = 200;
-    let startPheromone = 0.2;
-    let pheromoneConst = 10;
-    let pheromoneRemain = 0.8;
     let antAmount = numCities;
-    let iterAmount = 1000;
-    //
     let pheromone = [];
     let closeness = [];
+    best = new Tour([], 99999999999);
 
     for (let i = 0; i < numCities; i++) {
         pheromone.push([]);
@@ -104,22 +87,49 @@ function antAlg(citiesCords) {
             closeness[i].push(closeConst / distCities[i][j]);
         }
     }
+    getBestPath(citiesCords, distCities, numCities, antAmount, pheromone, closeness);
+}
+
+//
+let best = new Tour;
+let timer;
+let stopFlag = 0;
+document.getElementById("stop").onclick = () => stopFlag = 1;
+
+let alpha = 1;
+let beta = 3;
+let closeConst = 200;
+let startPheromone = 0.2;
+let pheromoneConst = 10;
+let pheromoneRemain = 0.8;
+let iterAmount = 1000;
+let counter = 0;
+
+//
+function getBestPath(citiesCords, distCities, numCities, antAmount, pheromone, closeness){
     let thisIter;
     let tour;
-    let best = new Tour([], 99999999999);
-    for (let i = 0; i < iterAmount; i++){
-        thisIter = [];
-        for (let j = 0; j < antAmount; j++){
-            tour = new Tour;
-            tour.generateTour(j, numCities, distCities, pheromone, closeness, alpha, beta)
-            thisIter.push(tour);
-            if (tour.distance < best.distance) {
-                best = tour;
-                drawTour(citiesCords, best);
-            } //console.log(best);}
+    let time = 0;
+    counter++;
+    thisIter = [];
+    console.log(counter);
+    console.log(best.distance);
+
+    for (let j = 0; j < antAmount; j++){
+
+        tour = new Tour;
+        tour.generateTour(j, numCities, distCities, pheromone, closeness, alpha, beta)
+        thisIter.push(tour);
+
+        if (tour.distance < best.distance) {
+            counter = 0;
+            time = 300;
+            best = tour;
+            drawTour(citiesCords, best);
         }
-        pheromone = pheromoneUpdate(thisIter, numCities, pheromone, pheromoneConst, pheromoneRemain)
     }
-    console.log("best way: ");
-    console.log(best);
+
+    pheromone = pheromoneUpdate(thisIter, numCities, pheromone, pheromoneConst, pheromoneRemain)
+    if (counter < iterAmount && stopFlag === 0) timer = setTimeout(getBestPath, time, citiesCords, distCities, numCities, antAmount, pheromone, closeness);
+    else stopFlag = 0;
 }

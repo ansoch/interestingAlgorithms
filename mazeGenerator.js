@@ -88,4 +88,4 @@ function getNear(point, visited, size) {
     return neighbours;
 }
 
-export {generateMaze};
+//export {generateMaze};
