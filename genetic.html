@@ -3,38 +3,42 @@
 	<head>
 		<meta charset = "utf-8">
 		<title>Genetic</title>
-		<link rel="stylesheet" href = "genCSS.css">
+		<link rel="stylesheet" href = "goslingCSS.css">
 	</head>
 
 	<body>
 		<div class="sidenav">
 			<a href="genetic.html">ГЕНЕТИКА</a>
 			<a href="ants.html">МУРАВЬИ</a>
+			<a href="astar.html">A*</a>
+			<a href="clusters.html">КЛАСТЕРЫ</a>
+			<a href="">ДЕРЕВЬЯ</a>
+			<a href="">НЕЙРОСЕТЬ</a>
 		</div>
 
 		<div class="main">
-			<p align="center">ГЕНЕТИКА</p>
+			<p>ГЕНЕТИКА</p>
 			<canvas id = "canvas" style="display: block; border: 2px solid black"></canvas>
 		</div>
 
 		<div class="settings">
-			<label>Число поколений</label> <input type = "number" value = "500000" id = "maxGen" min = "10000" max = "1000000"/>
-			<button id="Gen" onclick="genAlg(citiesCord)"> Запустить </button>
-			<button id="clear" onclick="clearCanvas(); citiesCord = [];"> Очистить </button>
+			<button id="Gen" style="display: block;" onclick="genAlg(citiesCord)"> Запустить </button>
+			<button id="stop" style="display: block;"> Остановить </button>
+			<button id="clear" style="display: block;" onclick="clearCanvas(); citiesCord = [];"> Очистить </button>
 		</div>
 
 		<script>
 			let canvas = document.getElementById("canvas");
 			let ctx = canvas.getContext("2d");
-			canvas.width = 1200;
+			canvas.width = 1400;
 			canvas.height = 800;
 			ctx.lineWidth = 7;
 			//
 			let citiesCord = [];
 
-			canvas.addEventListener("mousedown", function addCity(pos){
-				let x = pos.clientX - 160;
-				let y = pos.clientY - 60;
+			canvas.addEventListener("click", function addCity(event){
+				const x = event.offsetX;
+				const y = event.offsetY;
 				for (let i = 0; i < citiesCord.length; i++){
 					if (Math.sqrt(
 							Math.pow(citiesCord[i][0] - x, 2) + Math.pow(citiesCord[i][1] - y, 2)
@@ -57,6 +61,17 @@
 					ctx.arc(citiesCord[i][0], citiesCord[i][1], 15, 0, 2 * Math.PI);
 					ctx.fill();
 				}
+			}
+			function drawTour(citiesCords, tour){
+				clearCanvas();
+				restore(citiesCords);
+				ctx.beginPath();
+				ctx.moveTo(citiesCords[tour.tour[0]][0], citiesCords[tour.tour[0]][1]);
+				for(let i = 1; i < tour.tour.length; i++){
+					ctx.lineTo(citiesCords[tour.tour[i]][0], citiesCords[tour.tour[i]][1])
+				}
+				ctx.stroke();
+				return 1;
 			}
 
 		</script>

@@ -97,4 +97,4 @@ function findPath(field, start, end) {
     };
 }
 
-export {findPath};
+//export {findPath};

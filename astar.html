@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset = "utf-8">
+    <link rel="stylesheet" href = "goslingCSS.css">
     <title>A*</title>
 </head>
 <body>
-    <canvas id="canvas" height="600" width="600" style="border: 1px solid black;"></canvas>
-    <p></p>
+
+    <div class="sidenav">
+        <a href="genetic.html">ГЕНЕТИКА</a>
+        <a href="ants.html">МУРАВЬИ</a>
+        <a href="astar.html">A*</a>
+        <a href="clusters.html">КЛАСТЕРЫ</a>
+        <a href="">ДЕРЕВЬЯ</a>
+        <a href="">НЕЙРОСЕТЬ</a>
+    </div>
+
+    <div class="main">
+        <p>А*</p>
+        <canvas id="canvas" height="600" width="600" style="border: 1px solid black;"></canvas>
+    </div>>
+
+    <div class="settings">
     <button type="button" onclick="" id="startpoint">Установить точку начала</button>
     <button type="button" onclick="" id="endpoint">Установить точку конца</button>
     <button type="button" onclick="" id="search">Запустить алгоритм</button>
     <button type="button" onclick="" id="modify">Модифицировать лабиринт</button>
     <button type="button" onclick="generate();" id="generate">Сгенерировать новый лабиринт</button>
-    <p>Размер лабиринта</p>
-    <input type="range" id="size" min="5" max="20" step="1" value="10">
+    <label>Размер лабиринта</label><input type="range" id="size" min="5" max="20" step="1" value="10">
+    </div>
+
     <script type="module">
-        import {generateMaze} from "./mazeGenerator.js";
-        import {findPath} from "./aStarAlgo.js";
+        //import {generateMaze} from "./mazeGenerator.js";
+        //import {findPath} from "./aStarAlgo.js";
         const canvas = document.getElementById('canvas');
         const spointbutton = document.getElementById('startpoint');
         const epointbutton = document.getElementById('endpoint');
@@ -37,9 +53,10 @@
             generate(n);
         };
         searchbutton.onclick = function(){drawPath()};
+
         canvas.onclick = function(event){
-            let x = event.x - 8;
-            let y = event.y - 8;
+            let x = event.offsetX;
+            let y = event.offsetY;
             if(mapMode === 'none') return;
             let xcell = Math.floor(x / s);
             let ycell = Math.floor(y / s);
@@ -65,11 +82,11 @@
         }
 
         function drawMaze() {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, 600, 600);
+            //ctx.fillStyle = 'white';
+            ctx.clearRect(0, 0, 600, 600);
             ctx.fillStyle = 'black';
-            for(var i = 0; i < 2 * n + 1; i++) {
-                for(var j = 0; j < 2 * n + 1; j++) {
+            for(let i = 0; i < 2 * n + 1; i++) {
+                for(let j = 0; j < 2 * n + 1; j++) {
                     if(maze[i][j] === 0) {
                         ctx.fillRect(i * s, j * s, s, s);
                     }
@@ -84,11 +101,13 @@
         function drawPath() {
             const path = findPath(maze, spoint, epoint);
             ctx.fillStyle = 'orange';
-            for(var i = 0; i < path['optimal'].length; i++) {
+            for(let i = 0; i < path['optimal'].length; i++) {
                 ctx.fillRect(path['optimal'][i][0] * s, path['optimal'][i][1] * s, s, s);
             }
         }
         generate(n);
     </script>
+    <script src = aStarAlgo.js></script>
+    <script src = mazeGenerator.js></script>
 </body>
 </html>

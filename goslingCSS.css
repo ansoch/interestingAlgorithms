@@ -8,6 +8,7 @@
     padding-top: 90px;
     margin-left: 180px;
     background-color: #818181;
+    border-radius: 6px;
 
 }
 .settings button{
@@ -19,7 +20,14 @@
     color: #e8e8e8;
     display: block;
     border: 1px solid #818181;
+    cursor: pointer;
 }
+
+.settings button:hover{
+    background-color: #010507;
+}
+
+
 .settings input {
     background-color: #3c829a;
     padding: 6px 8px 6px 16px;
@@ -30,6 +38,7 @@
     border: 1px solid #818181;
 }
 
+
 .main {
     margin-left: 420px;
     height: 100%;
@@ -38,14 +47,12 @@
     z-index: 1;
     top: 0;
     left: 0;
-    'background-color: #a2a2a2;
+    
 }
 .main p{
     width: 100%;
     font-size: 35px;
     padding-left: 30%;
-    'color: #ffffff;
-
 }
 .main canvas{
     background-color: #c9bebe;
@@ -69,5 +76,8 @@
     display: block;
     background-color: #3c829a;
     border: 1px solid #818181;
-
+    cursor: pointer;
+}
+a:hover {
+    background-color: #010507;
 }

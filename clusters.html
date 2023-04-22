@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html>
-    <head><title>nigger</title></html>
+<html lang = "en">
+    <head>
+        <title>Clusters</title>
+        <meta charset = "utf-8">
+        <link rel="stylesheet" href = "goslingCSS.css">
+    </head>
+
     <body>
-        <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;"></canvas>
-        <button onclick="kmeansclusters(points, ctx)">kmeans</button>
-        <button onclick="hierarchyclusters(points, ctx)">hiers</button>
-        <button onclick="pamclusters(points, ctx)">pam</button>
+    <div class="sidenav">
+        <a href="genetic.html">ГЕНЕТИКА</a>
+        <a href="ants.html">МУРАВЬИ</a>
+        <a href="astar.html">A*</a>
+        <a href="clusters.html">КЛАСТЕРЫ</a>
+        <a href="">ДЕРЕВЬЯ</a>
+        <a href="">НЕЙРОСЕТЬ</a>
+    </div>
+
+    <div class="settings">
+        <button onclick="kmeansclusters(points, ctx)">KMEANS</button>
+        <button onclick="hierarchyclusters(points, ctx)">HIERS</button>
+        <button onclick="pamclusters(points, ctx)">PAM</button>
+    </div>
+    <div class="main">
+        <p>КЛАСТЕРЫ</p>
+        <canvas id="myCanvas" width="800" height="800" style="border:1px solid #000000;"></canvas>
+    </div>
+
+
         <script>
             // Получаем элемент canvas
             const canvas = document.getElementById('myCanvas');
